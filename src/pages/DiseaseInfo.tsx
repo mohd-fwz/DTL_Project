@@ -1,84 +1,229 @@
-import React from 'react';
+import React from "react";
 import {
   Container,
   Typography,
   Box,
   Card,
   CardContent,
-  CardActions,
-  Button,
-} from '@mui/material';
+  Grid,
+  Chip,
+  Stack
+} from "@mui/material";
+import DiseaseBackground from "../components/DiseaseBackground";
 
 const diseases = [
   {
     name: "Alzheimer's Disease",
-    description: "A progressive neurodegenerative disorder causing memory loss and cognitive decline.",
-    symptoms: "Memory loss, confusion, difficulty with familiar tasks, mood changes.",
-    importance: "Early detection allows for better management and potential treatment options.",
+    description:
+      "A progressive neurodegenerative disorder affecting memory and cognitive function.",
+    symptoms:
+      "Memory loss, confusion, difficulty with familiar tasks, mood changes.",
+    importance:
+      "Early detection improves treatment planning and slows cognitive decline."
   },
   {
     name: "Parkinson's Disease",
-    description: "A movement disorder affecting coordination and causing tremors.",
-    symptoms: "Tremors, stiffness, balance issues, slowed movement.",
-    importance: "Voice biomarkers can detect subtle changes before physical symptoms appear.",
+    description:
+      "A neurological movement disorder impacting motor control and coordination.",
+    symptoms:
+      "Tremors, muscle stiffness, balance problems, slowed movement.",
+    importance:
+      "Voice biomarkers detect early neurological changes before physical symptoms."
   },
   {
     name: "Huntington's Disease",
-    description: "An inherited disorder causing progressive breakdown of nerve cells in the brain.",
-    symptoms: "Uncontrolled movements, cognitive decline, psychiatric symptoms.",
-    importance: "Early screening is crucial for genetic counseling and planning.",
+    description:
+      "A hereditary disorder causing progressive nerve cell degeneration.",
+    symptoms:
+      "Involuntary movements, behavioral changes, cognitive decline.",
+    importance:
+      "Early screening supports genetic counseling and long-term care planning."
   },
   {
     name: "ALS (Amyotrophic Lateral Sclerosis)",
-    description: "A progressive neurodegenerative disease affecting nerve cells in the brain and spinal cord.",
-    symptoms: "Muscle weakness, difficulty speaking and swallowing, respiratory issues.",
-    importance: "Voice analysis can help in early diagnosis and monitoring progression.",
-  },
+    description:
+      "A progressive disease affecting motor neurons in the brain and spinal cord.",
+    symptoms:
+      "Muscle weakness, speech difficulty, swallowing problems.",
+    importance:
+      "Voice analysis supports early diagnosis and progression monitoring."
+  }
 ];
 
 const DiseaseInfo: React.FC = () => {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        Understanding Neurodegenerative Diseases
-      </Typography>
-      <Typography variant="body1" paragraph align="center" sx={{ mb: 4 }}>
-        Neurodegenerative diseases affect millions worldwide. Early detection through voice biomarkers offers hope for timely intervention and improved quality of life.
-      </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-        {diseases.map((disease, index) => (
-          <Box sx={{ flex: '1 1 300px' }} key={index}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {disease.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  {disease.description}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Symptoms:
-                </Typography>
-                <Typography variant="body2" paragraph>
-                  {disease.symptoms}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Early Detection Importance:
-                </Typography>
-                <Typography variant="body2">
-                  {disease.importance}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" color="primary">
-                  Learn More
-                </Button>
-              </CardActions>
-            </Card>
-          </Box>
-        ))}
-      </Box>
-    </Container>
+    <Box
+      sx={{
+        position: "relative",
+        overflow: "hidden",
+        py: { xs: 8, md: 12 },
+        background:
+          "radial-gradient(circle at top right, rgba(56,189,248,0.15), transparent 50%), linear-gradient(180deg,#f8fafc 0%, #ffffff 60%)"
+      }}
+    >
+      <DiseaseBackground />
+
+      {/* Glow Accent Blob */}
+      <Box
+        sx={{
+          position: "absolute",
+          width: 420,
+          height: 420,
+          borderRadius: "50%",
+          background: "rgba(37,99,235,0.12)",
+          filter: "blur(120px)",
+          top: -120,
+          left: -120,
+          zIndex: 0
+        }}
+      />
+
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+        {/* HEADER */}
+        <Stack spacing={2.5} alignItems="center" textAlign="center" mb={8}>
+          <Chip
+            label="Voice Biomarker Research"
+            sx={{
+              bgcolor: "rgba(37,99,235,0.1)",
+              color: "#2563eb",
+              fontWeight: 600
+            }}
+          />
+
+          <Typography
+            sx={{
+              fontSize: { xs: "2rem", md: "2.6rem" },
+              fontWeight: 800,
+              color: "#0f172a",
+              maxWidth: 720
+            }}
+          >
+            Neurodegenerative Disease Insights
+          </Typography>
+
+          <Typography
+            sx={{
+              maxWidth: 620,
+              color: "#475569",
+              fontSize: "1rem",
+              lineHeight: 1.7
+            }}
+          >
+            Leveraging voice-based biomarkers to enable earlier diagnosis and
+            smarter neurological monitoring.
+          </Typography>
+        </Stack>
+
+        {/* GRID */}
+        <Grid container spacing={4} justifyContent="center">
+          {diseases.map((disease, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card
+                sx={{
+                  height: "100%",
+                  borderRadius: "22px",
+                  background:
+                    "linear-gradient(180deg, #ffffff 0%, #f9fafb 100%)",
+                  border: "1px solid rgba(15,23,42,0.08)",
+                  boxShadow: "0 12px 30px rgba(0,0,0,0.07)",
+                  transition: "0.3s ease",
+                  position: "relative",
+                  overflow: "hidden",
+                  "&:hover": {
+                    transform: "translateY(-8px)",
+                    boxShadow: "0 24px 48px rgba(0,0,0,0.12)"
+                  }
+                }}
+              >
+                {/* Top Gradient Strip */}
+                <Box
+                  sx={{
+                    height: 6,
+                    width: "100%",
+                    background:
+                      "linear-gradient(90deg,#2563eb,#38bdf8)"
+                  }}
+                />
+
+                <CardContent sx={{ p: 3 }}>
+                  <Stack spacing={2.2}>
+                    {/* Title */}
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "1.05rem",
+                        color: "#0f172a"
+                      }}
+                    >
+                      {disease.name}
+                    </Typography>
+
+                    {/* Description */}
+                    <Typography
+                      sx={{
+                        fontSize: "0.9rem",
+                        color: "#475569",
+                        lineHeight: 1.6
+                      }}
+                    >
+                      {disease.description}
+                    </Typography>
+
+                    {/* Symptoms */}
+                    <Box>
+                      <Chip
+                        label="Symptoms"
+                        size="small"
+                        sx={{
+                          mb: 1,
+                          bgcolor: "rgba(37,99,235,0.1)",
+                          color: "#2563eb",
+                          fontWeight: 600
+                        }}
+                      />
+
+                      <Typography
+                        sx={{
+                          fontSize: "0.85rem",
+                          color: "#334155",
+                          lineHeight: 1.6
+                        }}
+                      >
+                        {disease.symptoms}
+                      </Typography>
+                    </Box>
+
+                    {/* Importance */}
+                    <Box>
+                      <Chip
+                        label="Early Detection"
+                        size="small"
+                        sx={{
+                          mb: 1,
+                          bgcolor: "rgba(56,189,248,0.12)",
+                          color: "#0284c7",
+                          fontWeight: 600
+                        }}
+                      />
+
+                      <Typography
+                        sx={{
+                          fontSize: "0.85rem",
+                          color: "#334155",
+                          lineHeight: 1.6
+                        }}
+                      >
+                        {disease.importance}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 

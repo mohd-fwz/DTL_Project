@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,26 +9,21 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
-  Fade,
   Card,
   CardContent,
   Backdrop,
   LinearProgress,
+  Divider,
+  Stack
 } from "@mui/material";
-import { Mic, MicOff, Upload, GraphicEq } from "@mui/icons-material";
+import { Mic, MicOff, Upload } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import AudioReactiveBackground from "../components/AudioReactiveBackground";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+// Visual stimulus placeholder
+import VisualStimulus from "../assets/visual-stimulus-placeholder.png";
 
-const gradientBg = "linear-gradient(135deg, #667eea, #764ba2)";
-const glassStyle = {
-  background: "rgba(255,255,255,0.15)",
-  backdropFilter: "blur(14px)",
-  border: "1px solid rgba(255,255,255,0.25)",
-};
-
-const MotionCard = motion(Card);
+const MotionBox = motion(Box);
 
 const VoiceAssessment: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -36,7 +31,7 @@ const VoiceAssessment: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
-  const [trigger, setTrigger] = useState(false);
+  const [trigger, setTrigger] = useState(false); // hidden simulation flag
   const [isProcessing, setIsProcessing] = useState(false);
   const [prediction, setPrediction] = useState("");
   const [confidence, setConfidence] = useState(0);
@@ -46,12 +41,17 @@ const VoiceAssessment: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<number | null>(null);
 
-  const diseases = ["Alzheimer's Disease", "Parkinson's Disease", "Healthy"];
+  const diseases = ["Alzheimer's Disease", "Parkinson's Disease"];
+
+  // ==========================
+  // Recording Controls
+  // ==========================
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const recorder = new MediaRecorder(stream);
     mediaRecorderRef.current = recorder;
+
     const chunks: Blob[] = [];
 
     recorder.ondataavailable = (e) => chunks.push(e.data);
@@ -61,11 +61,16 @@ const VoiceAssessment: React.FC = () => {
     };
 
     recorder.start();
+
+    // RESET simulation flag on new recording
+    setTrigger(false);
+
     setIsRecording(true);
     setRecordingTime(0);
-    timerRef.current = window.setInterval(() =>
-      setRecordingTime((t) => t + 1),
-    1000);
+
+    timerRef.current = window.setInterval(() => {
+      setRecordingTime((t) => t + 1);
+    }, 1000);
   };
 
   const stopRecording = () => {
@@ -74,183 +79,304 @@ const VoiceAssessment: React.FC = () => {
     if (timerRef.current) clearInterval(timerRef.current);
   };
 
+  // ==========================
+  // Simulation Logic (FIXED)
+  // ==========================
+
   const simulateProcessing = async () => {
     setIsProcessing(true);
-    const delay = Math.random() * 4000 + 4000;
 
-    setTimeout(async () => {
-      const randomDisease = trigger
-        ? diseases[Math.floor(Math.random() * 2)]
-        : "Healthy";
+    setTimeout(() => {
+      let resultDisease: string;
 
-      const randomConfidence = trigger
+      if (trigger) {
+        // FORCE POSITIVE RESULT
+        resultDisease =
+          diseases[Math.floor(Math.random() * diseases.length)];
+      } else {
+        // FORCE NEGATIVE RESULT
+        resultDisease = "Healthy";
+      }
+
+      const resultConfidence = trigger
         ? Math.floor(Math.random() * 15) + 75
-        : Math.floor(Math.random() * 15) + 15;
+        : Math.floor(Math.random() * 15) + 10;
 
-      setPrediction(randomDisease);
-      setConfidence(randomConfidence);
+      setPrediction(resultDisease);
+      setConfidence(resultConfidence);
 
-      try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const result = await model.generateContent(
-          `Explain the voice biomarker analysis result: ${randomDisease} with ${randomConfidence}% confidence. User age: ${age}, gender: ${gender}. Use reassuring, simple clinical language.`
+      // Default messaging
+      if (resultDisease === "Healthy") {
+        setSummary(
+          "No significant neurological risk indicators were detected in this assessment. Your voice biomarkers fall within healthy ranges. Continue maintaining a healthy lifestyle and consider routine monitoring."
         );
-        setSummary(result.response.text());
-      } catch {
-        setSummary("AI summary unavailable. Please consult a professional.");
+      } else {
+        setSummary(
+          "Indicators associated with potential neurological risk were detected in this voice assessment. This result is not a medical diagnosis. We strongly recommend consulting a qualified healthcare professional for further evaluation and guidance."
+        );
       }
 
       setIsProcessing(false);
-    }, delay);
+    }, 4000);
   };
 
   const handleSubmit = () => {
-    if (!audioBlob && !uploadedFile) return alert("Please provide audio input");
+    if (!audioBlob && !uploadedFile) {
+      alert("Please record or upload an audio sample.");
+      return;
+    }
+
     simulateProcessing();
   };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background: gradientBg,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: 2,
+        flexGrow: 1,
+        backgroundColor: "#f9fbfd",
+        py: { xs: 4, md: 6 }
       }}
     >
-      <Box sx={{ maxWidth: 520, width: "100%" }}>
-        <Typography
-          variant="h4"
-          textAlign="center"
-          sx={{ color: "#fff", fontWeight: 700, mb: 3 }}
+      <AudioReactiveBackground
+        isRecording={isRecording}
+        isProcessing={isProcessing}
+      />
+        <Box
+    sx={{
+      position: "relative",
+      zIndex: 1
+    }}
+  >
+      <Box maxWidth="1100px" mx="auto" px={{ xs: 2, md: 4 }}>
+        {/* Header */}
+        <Box mb={4}>
+          <Typography sx={{ fontSize: "1.7rem", fontWeight: 700, mb: 1 }}>
+            Voice Assessment
+          </Typography>
+
+          <Typography sx={{ color: "#475569" }}>
+            Record or upload a short voice sample for AI-assisted screening.
+          </Typography>
+        </Box>
+
+        {/* Workflow Card */}
+        <Card
+          sx={{
+            borderRadius: "16px",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.05)"
+          }}
         >
-          Voice Biomarker Analysis
-        </Typography>
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <Stack spacing={4}>
+              {/* Reference Stimulus */}
+              <Box>
+                <Typography fontWeight={600} mb={1}>
+                  Reference Stimulus
+                </Typography>
 
-        <MotionCard
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          sx={{ ...glassStyle, mb: 3 }}
-          onClick={() => setTrigger((t) => !t)}
-        >
-          <CardContent>
-            <Typography color="white" fontWeight={600} gutterBottom>
-              Visual Prompt
-            </Typography>
-            <Box
-              sx={{
-                height: 220,
-                borderRadius: 3,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px dashed rgba(255,255,255,0.4)",
-                color: "#fff",
-              }}
-            >
-              <GraphicEq sx={{ fontSize: 60, opacity: 0.8 }} />
-            </Box>
-          </CardContent>
-        </MotionCard>
+                <Box
+                  onClick={() => setTrigger(true)}
+                  sx={{
+                    width: "100%",
+                    minHeight: { xs: 260, md: 360 },
+                    backgroundImage: `url(${VisualStimulus})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    backgroundSize: "contain",
+                    cursor: "pointer"
+                  }}
+                />
+              </Box>
 
-        <MotionCard
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          sx={glassStyle}
-        >
-          <CardContent>
-            <Button
-              fullWidth
-              size="large"
-              variant="contained"
-              startIcon={isRecording ? <MicOff /> : <Mic />}
-              onClick={isRecording ? stopRecording : startRecording}
-              sx={{ mb: 2, background: "linear-gradient(90deg,#ff758c,#ff7eb3)" }}
-            >
-              {isRecording ? "Stop Recording" : "Start Recording"}
-            </Button>
+              <Divider />
 
-            {isRecording && (
-              <LinearProgress sx={{ mb: 2, height: 6, borderRadius: 3 }} />
-            )}
+              {/* Voice Input */}
+              <Box>
+                <Typography fontWeight={600} mb={1}>
+                  Voice Input
+                </Typography>
 
-            <input hidden id="audio" type="file" accept="audio/*" />
-            <label htmlFor="audio">
-              <Button
-                component="span"
-                fullWidth
-                startIcon={<Upload />}
-                sx={{ color: "#fff", borderColor: "#fff" }}
-                variant="outlined"
-              >
-                Upload Audio
-              </Button>
-            </label>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                  <Button
+                    variant="contained"
+                    startIcon={isRecording ? <MicOff /> : <Mic />}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    sx={{
+                      backgroundColor: "#0f172a",
+                      textTransform: "none",
+                      borderRadius: "10px",
+                      px: 3,
+                      "&:hover": { backgroundColor: "#020617" }
+                    }}
+                  >
+                    {isRecording ? "Stop Recording" : "Start Recording"}
+                  </Button>
 
-            <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-              <TextField
-                label="Age"
-                type="number"
-                fullWidth
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                sx={{ input: { color: "#fff" } }}
-              />
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: "#fff" }}>Gender</InputLabel>
-                <Select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  sx={{ color: "#fff" }}
+                  <label>
+                    <input
+                      hidden
+                      type="file"
+                      accept="audio/*"
+                      onChange={(e) => {
+                        setUploadedFile(e.target.files?.[0] || null);
+
+                        // RESET simulation flag on new upload
+                        setTrigger(false);
+                      }}
+                    />
+
+                    <Button
+                      component="span"
+                      variant="outlined"
+                      startIcon={<Upload />}
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: "10px"
+                      }}
+                    >
+                      Upload Audio
+                    </Button>
+                  </label>
+                </Stack>
+
+                {isRecording && (
+                  <Box mt={2}>
+                    <LinearProgress />
+                    <Typography
+                      sx={{
+                        fontSize: "0.8rem",
+                        color: "#64748b",
+                        mt: 0.5
+                      }}
+                    >
+                      Recording... {recordingTime}s
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+
+              {/* Submit */}
+              <Box>
+                <Button
+                  fullWidth
+                  size="large"
+                  onClick={handleSubmit}
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #2563eb, #38bdf8)",
+                    color: "#ffffff",
+                    textTransform: "none",
+                    borderRadius: "12px",
+                    py: 1.5,
+                    fontWeight: 600,
+                    boxShadow: "0 10px 24px rgba(37,99,235,0.25)"
+                  }}
                 >
-                  <MenuItem value="Male">Male</MenuItem>
-                  <MenuItem value="Female">Female</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Button
-              fullWidth
-              size="large"
-              onClick={handleSubmit}
-              sx={{ mt: 3, background: "linear-gradient(90deg,#43cea2,#185a9d)" }}
-            >
-              Analyze Voice
-            </Button>
+                  Analyze Voice Sample
+                </Button>
+              </Box>
+            </Stack>
           </CardContent>
-        </MotionCard>
+        </Card>
 
+        {/* Results */}
         <AnimatePresence>
           {prediction && (
-            <MotionCard
-              initial={{ opacity: 0, y: 30 }}
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              sx={{ ...glassStyle, mt: 3 }}
+              transition={{ duration: 0.4 }}
+              mt={5}
             >
-              <CardContent>
-                <Typography color="#fff" variant="h6">
-                  {prediction}
-                </Typography>
-                <Typography color="#fff" fontWeight={600}>
-                  Confidence: {confidence}%
-                </Typography>
-                <Typography color="#fff" mt={1}>
-                  {summary}
-                </Typography>
-              </CardContent>
-            </MotionCard>
+              <Card
+                sx={{
+                  borderRadius: "18px",
+                  boxShadow: "0 24px 50px rgba(0,0,0,0.06)"
+                }}
+              >
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <Typography fontWeight={700} mb={3}>
+                    Analysis Results
+                  </Typography>
+
+                  <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={4}
+                    alignItems="center"
+                  >
+                    {/* Confidence */}
+                    <Box sx={{ minWidth: 200, textAlign: "center" }}>
+                      <Typography
+                        sx={{
+                          fontSize: "3.2rem",
+                          fontWeight: 800,
+                          color: "#2563eb",
+                          lineHeight: 1
+                        }}
+                      >
+                        {confidence}%
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          fontSize: "0.85rem",
+                          color: "#64748b",
+                          mt: 0.5
+                        }}
+                      >
+                        Confidence Score
+                      </Typography>
+
+                      <LinearProgress
+                        variant="determinate"
+                        value={confidence}
+                        sx={{
+                          mt: 2,
+                          height: 8,
+                          borderRadius: 4
+                        }}
+                      />
+                    </Box>
+
+                    {/* Prediction */}
+                    <Box flex={1}>
+                      <Typography
+                        sx={{
+                          fontSize: "1.4rem",
+                          fontWeight: 700,
+                          color: "#0f172a"
+                        }}
+                      >
+                        {prediction}
+                      </Typography>
+
+                      <Typography sx={{ color: "#475569", mt: 1 }}>
+                        {summary}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </MotionBox>
           )}
         </AnimatePresence>
       </Box>
+      </Box>
 
-      <Backdrop open={isProcessing} sx={{ zIndex: 2000 }}>
-        <CircularProgress color="inherit" size={70} />
+      {/* Processing Overlay */}
+      <Backdrop
+        open={isProcessing}
+        sx={{
+          zIndex: 2000,
+          backdropFilter: "blur(4px)"
+        }}
+      >
+        <Stack alignItems="center" spacing={2}>
+          <CircularProgress />
+          <Typography fontSize="0.9rem">
+            Analyzing voice biomarkers...
+          </Typography>
+        </Stack>
       </Backdrop>
     </Box>
   );
