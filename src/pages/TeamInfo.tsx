@@ -6,7 +6,6 @@ import {
   Avatar,
   Card,
   CardContent,
-  Grid,
   Stack
 } from "@mui/material";
 import TeamNetworkBackground from "../components/TeamNetworkBackground";
@@ -93,9 +92,9 @@ const TeamInfo: React.FC = () => {
         </Stack>
 
         {/* TEAM GRID */}
-        <Grid container spacing={4} justifyContent="center">
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
           {teamMembers.map((member, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Box key={index} sx={{ flex: '1 1 250px', maxWidth: 300 }}>
               <Card
                 sx={{
                   textAlign: "center",
@@ -153,9 +152,9 @@ const TeamInfo: React.FC = () => {
                   </Stack>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {/* FOOTER NOTE */}
         <Box textAlign="center" mt={7}>

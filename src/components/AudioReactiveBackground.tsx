@@ -14,6 +14,12 @@ const AudioReactiveBackground: React.FC<Props> = ({
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
+  const getByteFrequencyData = (array: Uint8Array) => {
+    if (analyserRef.current) {
+      analyserRef.current.getByteFrequencyData(array as any);
+    }
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
@@ -78,9 +84,7 @@ const AudioReactiveBackground: React.FC<Props> = ({
       let intensity = 0;
 
       if (analyserRef.current && dataArrayRef.current) {
-        analyserRef.current.getByteFrequencyData(
-          dataArrayRef.current
-        );
+        getByteFrequencyData(dataArrayRef.current);
 
         const avg =
           dataArrayRef.current.reduce((a, b) => a + b, 0) /

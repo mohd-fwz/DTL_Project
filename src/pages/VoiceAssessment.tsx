@@ -3,11 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   CircularProgress,
   Card,
   CardContent,
@@ -29,8 +24,6 @@ const VoiceAssessment: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("");
   const [trigger, setTrigger] = useState(false); // hidden simulation flag
   const [isProcessing, setIsProcessing] = useState(false);
   const [prediction, setPrediction] = useState("");

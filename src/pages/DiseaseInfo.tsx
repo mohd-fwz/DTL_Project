@@ -5,7 +5,6 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
   Chip,
   Stack
 } from "@mui/material";
@@ -115,9 +114,9 @@ const DiseaseInfo: React.FC = () => {
         </Stack>
 
         {/* GRID */}
-        <Grid container spacing={4} justifyContent="center">
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
           {diseases.map((disease, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Box key={index} sx={{ flex: '1 1 350px', maxWidth: 400 }}>
               <Card
                 sx={{
                   height: "100%",
@@ -219,9 +218,9 @@ const DiseaseInfo: React.FC = () => {
                   </Stack>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );
