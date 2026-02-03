@@ -10,26 +10,31 @@ import {
 } from "@mui/material";
 import TeamNetworkBackground from "../components/TeamNetworkBackground";
 
+import fawazImg from "../assets/images/fawaz.png";
+import amanImg from "../assets/images/aman.jpg";
+import krrishImg from "../assets/images/krrish.jpeg";
+import karthikeyImg from "../assets/images/karthikey.png";
+
 const teamMembers = [
   {
     name: "Mohammed Fawaz Zakir",
     role: "Backend Developer",
-    image: "/images/fawaz.png"
+    image: fawazImg
   },
   {
     name: "Mohammed Aman Jukaku",
     role: "Machine Learning Engineer",
-    image: "/images/aman.jpg"
+    image: amanImg
   },
   {
     name: "Krrish Agarwal",
     role: "Voice Processing and Designing",
-    image: "/images/krrish.jpeg"
+    image: krrishImg
   },
   {
     name: "Karthikey Sharma",
     role: "Frontend Developer",
-    image: "/images/karthikey.png"
+    image: karthikeyImg
   }
 ];
 
