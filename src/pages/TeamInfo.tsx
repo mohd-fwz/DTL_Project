@@ -14,22 +14,22 @@ const teamMembers = [
   {
     name: "Mohammed Fawaz Zakir",
     role: "Backend Developer",
-    image: "DTL_Project/images/fawaz.png"
+    image: "/images/fawaz.png"
   },
   {
     name: "Mohammed Aman Jukaku",
     role: "Machine Learning Engineer",
-    image: "DTL_Project/images/aman.jpg"
+    image: "/images/aman.jpg"
   },
   {
     name: "Krrish Agarwal",
-    role: "Frontend Developer",
-    image: "DTL_Project/images/krrish.jpeg"
+    role: "Voice Processing and Designing",
+    image: "/images/krrish.jpeg"
   },
   {
     name: "Karthikey Sharma",
-    role: "Voice Processing and Designing",
-    image: "DTL_Project/images/karthikey.png"
+    role: "Frontend Developer",
+    image: "/images/karthikey.png"
   }
 ];
 
